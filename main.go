@@ -97,9 +97,10 @@ func fetchComicsPagesFromGoogleDrive() []string {
 
 		comicPages := []string{}
 
-		for i := 0; i < len(chapters.Files); i++ {
+		totalChapters := len(chapters.Files)
+		for i := 0; i < totalChapters; i++ {
 			chapter := chapters.Files[i]
-			fmt.Println("reading chapter ", chapter.Name)
+			fmt.Printf("reading chapter(%d/%d) %s", i+1, totalChapters, chapter.Name)
 			pages, err := getFilesFromFolder(driveService, chapter.Id)
 
 			if err == nil {
