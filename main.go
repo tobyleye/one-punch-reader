@@ -111,7 +111,7 @@ func fetchComicsPagesFromGoogleDrive() []string {
 				})
 
 				for _, page := range pages.Files {
-					downloadUrl := fmt.Sprintf("https://drive.usercontent.google.com/download?id=%s", page.Id)
+					downloadUrl := fmt.Sprintf("https://lh3.googleusercontent.com/d/%s", page.Id)
 					fmt.Println(downloadUrl)
 					comicPages = append(comicPages, downloadUrl)
 				}
