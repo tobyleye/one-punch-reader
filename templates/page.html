@@ -1,0 +1,79 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Page</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        width: 100%;
+      }
+
+      .app {
+        display: grid;
+        height: 100%;
+        grid-template-rows: 1fr auto;
+      }
+
+      .comic-viewer {
+        height: 90vh;
+        text-align: center;
+      }
+
+      .comic-viewer img {
+        max-height: 100%;
+        max-width: 100%;
+        display: inline-block;
+      }
+
+      .buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .buttons a {
+        display: block;
+        width: 100%;
+      }
+
+      .btn {
+        border: none;
+        height: 48px;
+        border-radius: 0;
+        width: 100%;
+        font-weight: 500;
+        text-transform: uppercase;
+        font-size: 16px;
+      }
+
+      .next-btn {
+        background-color: #005c29;
+        color: white;
+      }
+
+      .back-btn {
+        background-color: #d21404;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="app">
+      <div class="comic-viewer">
+        <img src="{{.Page}}" />
+      </div>
+
+      <div class="buttons">
+        <a href="/page/{{.PrevPage}}">
+          <button class="btn back-btn">back</button>
+        </a>
+        <a href="/page/{{ .NextPage }}">
+          <button class="btn next-btn">next</button>
+        </a>
+      </div>
+    </section>
+  </body>
+</html>

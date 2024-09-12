@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -16,16 +17,18 @@ import (
 
 func indexPage(w http.ResponseWriter, r *http.Request) {
 
-	html := `<html>
-		<body>
-			<h3>Welcome to your comic</h3>
-			<a href="/page/1">
-				<button>start reading here</button>
-			</a>
-		</body>
-	</html>`
+	// html := `<html>
+	// 	<body>
+	// 		<h3>Welcome to your comic</h3>
+	// 		<a href="/page/1">
+	// 			<button>start reading here</button>
+	// 		</a>
+	// 	</body>
+	// </html>`
 
-	w.Write([]byte(html))
+	t := template.Must(template.New("index.html").ParseFiles("./templates/index.html"))
+	t.Execute(w, struct{}{})
+
 }
 
 func fetchComicsPagesFromLocal() []string {
@@ -129,9 +132,9 @@ func main() {
 
 	var comicsPages []string
 
-	fetchFromGoogleDrive := true
+	fetchFromGoogleDrive := os.Getenv("FETCH_FROM_GOOGLE_DRIVE")
 
-	if fetchFromGoogleDrive {
+	if fetchFromGoogleDrive != "" {
 		comicsPages = fetchComicsPagesFromGoogleDrive()
 	} else {
 		comicsPages = fetchComicsPagesFromLocal()
@@ -158,32 +161,41 @@ func main() {
 			return
 		}
 
-		html := `<html>
-			<body>
-				<div>
-					<img src="%s" style="" />
-					</div>
-						
-					<a href="/page/%d">
-					<button>
-						back
-					</button>
-					</a>
-					<a href="/page/%d">
-						<button>next</button>
-					</a>
-					
-			</body>
-		</html>`
+		// html := `<html>
+		// 	<body>
+		// 		<div>
+		// 			<img src="%s" style="" />
+		// 			</div>
+
+		// 			<a href="/page/%d">
+		// 			<button>
+		// 				back
+		// 			</button>
+		// 			</a>
+		// 			<a href="/page/%d">
+		// 				<button>next</button>
+		// 			</a>
+
+		// 	</body>
+		// </html>`
 
 		pageComic := comicsPages[page-1]
 		nextPage := page + 1
 		prevPage := page - 1
 
-		html = fmt.Sprintf(html, pageComic, prevPage, nextPage)
+		args := struct {
+			Page     string
+			PrevPage int
+			NextPage int
+		}{
+			Page:     pageComic,
+			NextPage: nextPage,
+			PrevPage: prevPage,
+		}
+		t := template.Must(template.New("page.html").ParseFiles("./templates/page.html"))
+		w.WriteHeader(200)
+		t.Execute(w, args)
 
-		response := []byte(html)
-		w.Write(response)
 	}
 
 	http.HandleFunc("GET /page/{page}", sendPage)
@@ -194,7 +206,7 @@ func main() {
 	fmt.Print("starting server...")
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8082"
 	}
-	http.ListenAndServe(fmt.Sprintf(":%s", port), nil)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), nil))
 }
