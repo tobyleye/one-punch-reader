@@ -17,15 +17,6 @@ import (
 
 func indexPage(w http.ResponseWriter, r *http.Request) {
 
-	// html := `<html>
-	// 	<body>
-	// 		<h3>Welcome to your comic</h3>
-	// 		<a href="/page/1">
-	// 			<button>start reading here</button>
-	// 		</a>
-	// 	</body>
-	// </html>`
-
 	t := template.Must(template.New("index.html").ParseFiles("./templates/index.html"))
 	t.Execute(w, struct{}{})
 
@@ -160,24 +151,6 @@ func main() {
 			http.Redirect(w, r, "/page/1", http.StatusTemporaryRedirect)
 			return
 		}
-
-		// html := `<html>
-		// 	<body>
-		// 		<div>
-		// 			<img src="%s" style="" />
-		// 			</div>
-
-		// 			<a href="/page/%d">
-		// 			<button>
-		// 				back
-		// 			</button>
-		// 			</a>
-		// 			<a href="/page/%d">
-		// 				<button>next</button>
-		// 			</a>
-
-		// 	</body>
-		// </html>`
 
 		pageComic := comicsPages[page-1]
 		nextPage := page + 1
