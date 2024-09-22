@@ -15,10 +15,13 @@ import (
 	"google.golang.org/api/option"
 )
 
-func indexPage(w http.ResponseWriter, r *http.Request) {
+const PageState string = "./page"
 
+func indexPage(w http.ResponseWriter, r *http.Request) {
+	currentPage := getPage()
+	fmt.Println("current page is ", currentPage)
 	t := template.Must(template.New("index.html").ParseFiles("./templates/index.html"))
-	t.Execute(w, struct{}{})
+	t.Execute(w, struct{ CurrentPage int }{CurrentPage: currentPage})
 
 }
 
@@ -58,6 +61,33 @@ func getFilesFromFolder(driveService *drive.Service, folderId string) (*drive.Fi
 
 func getFolderNo(folderName string) string {
 	return strings.Split(folderName, "_c")[1]
+}
+
+func getPage() int {
+	file, err := os.ReadFile(PageState)
+	if err == nil {
+		page, err := strconv.Atoi(string(file))
+		if err == nil {
+			return page
+		}
+	}
+	return -1
+
+}
+
+func setCurrentPage(page int) {
+
+	fmt.Println("setting page..")
+	f, err := os.OpenFile(PageState, os.O_CREATE|os.O_WRONLY, 0644)
+	if err == nil {
+		_, err = f.WriteString(fmt.Sprintf("%d", page))
+
+	}
+	if err != nil {
+		log.Println("failed to write to page", err)
+	} else {
+		fmt.Println("page set successfully!")
+	}
 }
 
 func fetchComicsPagesFromGoogleDrive() []string {
@@ -131,13 +161,16 @@ func main() {
 		comicsPages = fetchComicsPagesFromLocal()
 	}
 
-	sendPage := func(w http.ResponseWriter, r *http.Request) {
+	getPage := func(w http.ResponseWriter, r *http.Request) {
 		rawPage := r.PathValue("page")
 		page, err := strconv.Atoi(rawPage)
+
 		if err != nil {
 			http.Redirect(w, r, "/page/1", http.StatusSeeOther)
 			return
 		}
+
+		go setCurrentPage(page)
 
 		lastPage := len(comicsPages)
 
@@ -171,7 +204,7 @@ func main() {
 
 	}
 
-	http.HandleFunc("GET /page/{page}", sendPage)
+	http.HandleFunc("GET /page/{page}", getPage)
 	http.Handle("/assets/",
 		http.StripPrefix("/assets", http.FileServer(http.Dir("./assets"))))
 	http.HandleFunc("/", indexPage)

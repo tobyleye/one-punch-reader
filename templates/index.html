@@ -32,8 +32,15 @@
   <body>
     <div class="landing">
       <h3 class="title">One punch man comics reader</h3>
+      {{ if (gt .CurrentPage -1) }}
+      <div>
+        <a href="/page/{{.CurrentPage}}">
+          <button>continue from where you stopped</button>
+        </a>
+      </div>
+      {{ end }}
       <a href="/page/1">
-        <button class="start-btn">start reading here</button>
+        <button class="start-btn">start here</button>
       </a>
     </div>
   </body>
