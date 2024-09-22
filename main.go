@@ -19,7 +19,6 @@ const PageState string = "./page"
 
 func indexPage(w http.ResponseWriter, r *http.Request) {
 	currentPage := getPage()
-	fmt.Println("current page is ", currentPage)
 	t := template.Must(template.New("index.html").ParseFiles("./templates/index.html"))
 	t.Execute(w, struct{ CurrentPage int }{CurrentPage: currentPage})
 
@@ -77,7 +76,6 @@ func getPage() int {
 
 func setCurrentPage(page int) {
 
-	fmt.Println("setting page..")
 	f, err := os.OpenFile(PageState, os.O_CREATE|os.O_WRONLY, 0644)
 	if err == nil {
 		_, err = f.WriteString(fmt.Sprintf("%d", page))
@@ -86,7 +84,7 @@ func setCurrentPage(page int) {
 	if err != nil {
 		log.Println("failed to write to page", err)
 	} else {
-		fmt.Println("page set successfully!")
+		log.Println("page set successfully!")
 	}
 }
 
@@ -94,18 +92,18 @@ func fetchComicsPagesFromGoogleDrive() []string {
 	ctx := context.Background()
 	driveService, err := drive.NewService(ctx, option.WithAPIKey(os.Getenv("GOOGLE_DRIVE_API_KEY")))
 	if err != nil {
-		fmt.Println("error connecting to drive service")
+		log.Println("error connecting to drive service")
 		log.Fatal(err)
 	}
 
-	fmt.Println("connected to drive successfully")
+	log.Println("connected to drive successfully")
 
 	const folderId string = "1V2N5gch1yRsFAwZ8ndtPTVoZSmYypUNT"
 
 	chapters, err := getFilesFromFolder(driveService, folderId)
 
 	if err != nil {
-		fmt.Println("unable to retrieve files..", err.Error())
+		log.Println("unable to retrieve files..", err.Error())
 		return []string{}
 
 	} else {
@@ -124,7 +122,7 @@ func fetchComicsPagesFromGoogleDrive() []string {
 		totalChapters := len(chapters.Files)
 		for i := 0; i < totalChapters; i++ {
 			chapter := chapters.Files[i]
-			fmt.Printf("reading chapter(%d/%d) %s", i+1, totalChapters, chapter.Name)
+			log.Printf("reading chapter(%d/%d) %s", i+1, totalChapters, chapter.Name)
 			pages, err := getFilesFromFolder(driveService, chapter.Id)
 
 			if err == nil {
@@ -136,7 +134,6 @@ func fetchComicsPagesFromGoogleDrive() []string {
 
 				for _, page := range pages.Files {
 					downloadUrl := fmt.Sprintf("https://lh3.googleusercontent.com/d/%s", page.Id)
-					fmt.Println(downloadUrl)
 					comicPages = append(comicPages, downloadUrl)
 				}
 
@@ -209,7 +206,7 @@ func main() {
 		http.StripPrefix("/assets", http.FileServer(http.Dir("./assets"))))
 	http.HandleFunc("/", indexPage)
 
-	fmt.Print("starting server...")
+	log.Println("starting server...")
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8082"

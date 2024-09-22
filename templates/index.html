@@ -27,6 +27,23 @@
         color: white;
         padding: 0 20px;
       }
+
+      .continue-btn {
+        border: none;
+        outline: none;
+        background-color: transparent;
+        background-color: green;
+        color: white;
+        font-size: 18px;
+        padding: 0 20px;
+        height: 40px;
+        text-transform: uppercase;
+      }
+
+      .continue-link {
+        margin-bottom: 14px;
+        display: inline-block;
+      }
     </style>
   </head>
   <body>
@@ -34,13 +51,13 @@
       <h3 class="title">One punch man comics reader</h3>
       {{ if (gt .CurrentPage -1) }}
       <div>
-        <a href="/page/{{.CurrentPage}}">
-          <button>continue from where you stopped</button>
+        <a class="continue-link" href="/page/{{.CurrentPage}}">
+          <button class="continue-btn">continue reading</button>
         </a>
       </div>
       {{ end }}
       <a href="/page/1">
-        <button class="start-btn">start here</button>
+        <button class="start-btn">start</button>
       </a>
     </div>
   </body>
