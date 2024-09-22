@@ -8,5 +8,5 @@ with each folder containing images which represented an actual page of the comic
 would read the pages from each folder, sort it, store it in an array and serve the pages from there. 
 
 ## Tools used
-Google drive (to store the images/comics)
-& obviously Golang
+- Google drive (to store the images/comics)
+- & obviously Golang
